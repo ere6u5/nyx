@@ -28,12 +28,12 @@
 
 ### Install from Source
 ```bash
-git clone https://github.com/karmanajs/nyx.git
+git clone https://github.com/ere6u5/nyx.git
 ```
 
 ### Using Go Install
 ```bash
-go install github.com/karmanajs/nyx@latest
+go install github.com/ere6u5/nyx@latest
 ```
 
 ### Build make or task
@@ -165,4 +165,4 @@ JSON output (when using -jf):
 ## License
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-Copyright © 2025 github.com/karmanajs
+Copyright © 2025 github.com/ere6u5
