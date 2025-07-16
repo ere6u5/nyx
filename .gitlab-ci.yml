@@ -1,0 +1,45 @@
+stages:
+  - build
+  - test
+  - deploy
+
+variables:
+  BIN_DIR: "./bin"
+  CLI_EXE: "nyx-cli"
+  SERVER_EXE: "nyx-server"
+
+image: golang:1.24.4-alpine3.21
+
+build_job:
+  stage: build
+  before_script:
+    - echo "Start build stage..."
+    - echo ""
+  script:
+    - make build-cli
+    - make build-server
+  artifacts:
+    paths:
+      - ${BIN_DIR}
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+
+test_job:
+  stage: test
+  script:
+    - make test
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+
+deploy_job:
+  stage: deploy
+  needs: [build_job, test_job]
+  before_script:
+    - echo "Server deploy..."
+  script:
+    - cd ${BIN_DIR}
+    - ./${SERVER_EXE} &
+    - sleep 5
+    - curl --fail http://localhost:8080
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
