@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/karmanajs/nyx/pkg/constants"
+	"gitlab.com/ere6u5/nyx/pkg/constants"
 )
 
 // ParsePorts: TODO doc
