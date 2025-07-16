@@ -5,7 +5,12 @@ SERVER_EXE := nyx-server
 .PHONY: init build-cli build-server clean all
 
 init:
+	@echo "Create a dirrectory $(BIN_DIR)"
+	@echo ""
+	@echo "Use build-cli/build-server/run-server..."
+	@echo "run-server not build binary file. Only run file"
 	@mkdir -p $(BIN_DIR)
+	@echo ""
 
 build-cli: init
 	@echo "Building CLI interface..."
