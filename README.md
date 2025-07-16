@@ -1,6 +1,6 @@
 # Nyx - Simple Port Scanner in Go
 
-**Nyx** is a dual-interface port scanning tool written in Go, offering both CLI and web-based scanning capabilities.
+**Nyx** is a dual-interface port scanning tool written in Go, offering both CLI and web-based scanning capabilities
 
 ![Nyx Web Interface](screenshots/web-interface.png)
 
