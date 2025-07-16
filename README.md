@@ -29,6 +29,8 @@
 ### Install from Source
 ```bash
 git clone https://github.com/ere6u5/nyx.git
+git clone https://gitlab.com/ere6u5/nyx.git
+
 ```
 
 ### Using Go Install
