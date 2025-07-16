@@ -2,12 +2,12 @@ BIN_DIR := ./bin
 CLI_EXE := nyx-cli
 SERVER_EXE := nyx-server
 
-.PHONY: init build-cli build-server clean all
+.PHONY: init build-cli build-server test clean all
 
 init:
 	@echo "Create a dirrectory $(BIN_DIR)"
 	@echo ""
-	@echo "Use build-cli/build-server/run-server..."
+	@echo "Use build-cli/build-server/run-server/test..."
 	@echo "run-server not build binary file. Only run file"
 	@mkdir -p $(BIN_DIR)
 	@echo ""
@@ -20,13 +20,17 @@ build-server: init
 	@echo "Building server interface..."
 	@go build -o $(BIN_DIR)/$(SERVER_EXE) ./cmd/server
 
-all: build-cli build-server
+test:
+	@echo "Testing project..."
+	@go test -v ./...
+
+run-server: build-server
+	@echo "Starting server..."
+	@$(BIN_DIR)/$(SERVER_EXE)
+
+all: build-cli build-server test
 
 clean:
 	@echo "Cleaning binaries..."
 	@rm -rf $(BIN_DIR)/*
 	@go clean
-
-run-server: build-server
-	@echo "Starting server..."
-	@$(BIN_DIR)/$(SERVER_EXE)

@@ -6,6 +6,13 @@ vars:
   SERVER_EXE: "nyx-server"
 
 tasks:
+  default:
+    silent: true
+    cmds:
+      - echo "Use build-cli/build-server/run-server..."
+      - echo ""
+      - echo "run-server not build binary file. Only run file"
+
   init:
     desc: "Create binaries directory"
     cmds:
@@ -23,20 +30,26 @@ tasks:
     cmds:
       - go build -o {{.BIN_DIR}}/{{.SERVER_EXE}} ./cmd/server
 
+  run-server:
+    desc: "Build and run web server"
+    cmds:
+      - task: build-server
+      - "{{.BIN_DIR}}/{{.SERVER_EXE}}"
+
+  test:
+    desc: "Testing project"
+    cmds:
+      - go test -v ./...
+
   all:
     desc: "Build both interfaces"
     cmds:
       - task: build-cli
       - task: build-server
+      - task: tesk
 
   clean:
     desc: "Remove all build artifacts"
     cmds:
       - rm -rf {{.BIN_DIR}}/*
       - go clean
-
-  run-server:
-    desc: "Build and run web server"
-    cmds:
-      - task: build-server
-      - "{{.BIN_DIR}}/{{.SERVER_EXE}}"
