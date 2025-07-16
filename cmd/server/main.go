@@ -10,9 +10,9 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/karmanajs/nyx/internal/core"
-	"github.com/karmanajs/nyx/internal/parser"
-	"github.com/karmanajs/nyx/pkg/types"
+	"gitlab.com/ere6u5/nyx/internal/core"
+	"gitlab.com/ere6u5/nyx/internal/parser"
+	"gitlab.com/ere6u5/nyx/pkg/types"
 )
 
 func main() {

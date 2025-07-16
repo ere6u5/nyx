@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/karmanajs/nyx/pkg/types"
+	"gitlab.com/ere6u5/nyx/pkg/types"
 )
 
 // TODO doc
