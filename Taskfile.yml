@@ -39,7 +39,7 @@ tasks:
   test:
     desc: "Testing project"
     cmds:
-      - go test -v ./...
+      - go test -v ./... | grep -v "no test files"
 
   all:
     desc: "Build both interfaces"

@@ -22,7 +22,7 @@ build-server: init
 
 test:
 	@echo "Testing project..."
-	@go test -v ./...
+	@go test -v ./... | grep -v "no test files"
 
 run-server: build-server
 	@echo "Starting server..."
