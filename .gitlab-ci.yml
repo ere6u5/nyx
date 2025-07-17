@@ -101,12 +101,12 @@ build_job:
   script:
     # === DEMO SECRETS - START ===
     - |
-      echo "=== DEMO SECRETS - START ==="
-      echo "Building with secure vars:" | sanitize_log
-      echo "API Token: ${DEMO_API_TOKEN}" | sanitize_log
-      echo "DB Pass: ${DEMO_DB_PASSWORD}" | sanitize_log
-      echo "Access token: ${DEMO_ACCESS_KEY}" | sanitize_log
-      echo "=== DEMO SECRETS - END ==="
+      echo "=== DEMO SECRETS - START ===" >> ${LOG_DIR}/${CI_JOB_NAME}.log
+      echo "Building with secure vars:" | sanitize_log >> ${LOG_DIR}/${CI_JOB_NAME}.log
+      echo "API Token: ${DEMO_API_TOKEN}" | sanitize_log >> ${LOG_DIR}/${CI_JOB_NAME}.log
+      echo "DB Pass: ${DEMO_DB_PASSWORD}" | sanitize_log >> ${LOG_DIR}/${CI_JOB_NAME}.log
+      echo "Access token: ${DEMO_ACCESS_KEY}" | sanitize_log >> ${LOG_DIR}/${CI_JOB_NAME}.log
+      echo "=== DEMO SECRETS - END ===" >> ${LOG_DIR}/${CI_JOB_NAME}.log
     # === DEMO SECRETS - END ===
 
     - make build-cli 2>&1 | tee -a ${LOG_DIR}/${CI_JOB_NAME}.log
@@ -126,12 +126,12 @@ test_job:
   script:
     # === DEMO SECRETS - START ===
     - |
-      echo "=== DEMO SECRETS - START ==="
-      echo "Building with secure vars:"
-      echo "API Token: ${DEMO_API_TOKEN}"
-      echo "DB Password: ${DEMO_DB_PASSWORD}"
-      echo "Access Key: ${DEMO_ACCESS_KEY}"
-      echo "=== DEMO SECRETS - END ==="
+      echo "=== DEMO SECRETS - START ===" >> ${LOG_DIR}/${CI_JOB_NAME}.log
+      echo "Building with secure vars:" >> ${LOG_DIR}/${CI_JOB_NAME}.log
+      echo "API Token: ${DEMO_API_TOKEN}" >> ${LOG_DIR}/${CI_JOB_NAME}.log
+      echo "DB Password: ${DEMO_DB_PASSWORD}" >> ${LOG_DIR}/${CI_JOB_NAME}.log
+      echo "Access Key: ${DEMO_ACCESS_KEY}" >> ${LOG_DIR}/${CI_JOB_NAME}.log
+      echo "=== DEMO SECRETS - END ===" >> ${LOG_DIR}/${CI_JOB_NAME}.log
     # === DEMO SECRETS - END ===
 
     - make test 2>&1 | tee -a ${LOG_DIR}/${CI_JOB_NAME}.log
@@ -151,12 +151,12 @@ deploy_job:
   script:
     # === DEMO SECRETS - START ===
     - |
-      echo "=== DEMO SECRETS - START ==="
-      echo "Building with secure vars:"
-      echo "API Token: ${DEMO_API_TOKEN}"
-      echo "DB Password: ${DEMO_DB_PASSWORD}"
-      echo "Access Key: ${DEMO_ACCESS_KEY}"
-      echo "=== DEMO SECRETS - END ==="
+      echo "=== DEMO SECRETS - START ===" >> ${LOG_DIR}/${CI_JOB_NAME}.log
+      echo "Building with secure vars:" >> ${LOG_DIR}/${CI_JOB_NAME}.log
+      echo "API Token: ${DEMO_API_TOKEN}" >> ${LOG_DIR}/${CI_JOB_NAME}.log
+      echo "DB Password: ${DEMO_DB_PASSWORD}" >> ${LOG_DIR}/${CI_JOB_NAME}.log
+      echo "Access Key: ${DEMO_ACCESS_KEY}" >> ${LOG_DIR}/${CI_JOB_NAME}.log
+      echo "=== DEMO SECRETS - END ===" >> ${LOG_DIR}/${CI_JOB_NAME}.log
     # === DEMO SECRETS - END ===
 
     # Start server
