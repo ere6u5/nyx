@@ -11,16 +11,13 @@ variables:
 
 image: golang:1.24.4-alpine3.21
 
-before_script:
-  - mkdir -p ${LOG_DIR}
-  - export LOG_TIMESTAMP=$(date +"%Y-%m-%d_%H-%M-%S")
-
 # ----------------------------
 # Setting's for all jobs
 # ----------------------------
 .default_settings: &default_settings
   before_script:
     - mkdir -p ${LOG_DIR}
+    - export LOG_TIMESTAMP=$(date +"%Y-%m-%d_%H-%M-%S")
     - echo "[${LOG_TIMESTAMP}] === ${CI_JOB_NAME} STARTED ===" >> ${LOG_DIR}/${CI_JOB_NAME}.log
   after_script:
     - echo "[${LOG_TIMESTAMP}] === ${CI_JOB_NAME} FINISHED ===" >> ${LOG_DIR}/${CI_JOB_NAME}.log
