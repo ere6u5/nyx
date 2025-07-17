@@ -15,52 +15,60 @@ before_script:
   - mkdir -p ${LOG_DIR}
   - export LOG_TIMESTAMP=$(date +"%Y-%m-%d_%H-%M-%S")
 
-build_job:
-  stage: build
-  script:
-    - echo "[${LOG_TIMESTAMP}] === BUILD STARTED ===" >> ${LOG_DIR}/build.log
-    - make build-cli 2>&1 | tee -a ${LOG_DIR}/build.log
-    - make build-server 2>&1 | tee -a ${LOG_DIR}/build.log
-    - echo "[${LOG_TIMESTAMP}] === BUILD FINISHED ===" >> ${LOG_DIR}/build.log
+# ----------------------------
+# Setting's for all jobs
+# ----------------------------
+.default_settings: &default_settings
+  before_script:
+    - mkdir -p ${LOG_DIR}
+    - echo "[${LOG_TIMESTAMP}] === ${CI_JOB_NAME} STARTED ===" >> ${LOG_DIR}/${CI_JOB_NAME}.log
+  after_script:
+    - echo "[${LOG_TIMESTAMP}] === ${CI_JOB_NAME} FINISHED ===" >> ${LOG_DIR}/${CI_JOB_NAME}.log
   artifacts:
     paths:
-      - ${BIN_DIR}
-      - ${LOG_DIR}/build.log
+      - ${LOG_DIR}/
     expire_in: 1 week
+    when: always
+
+# ----------------------------
+# Build stage
+# ----------------------------
+build_job:
+  stage: build
+  <<: *default_settings
+  script:
+    - make build-cli 2>&1 | tee -a ${LOG_DIR}/${CI_JOB_NAME}.log
+    - make build-server 2>&1 | tee -a ${LOG_DIR}/${CI_JOB_NAME}.log
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
     - if: $CI_COMMIT_BRANCH == "main" 
 
+# ----------------------------
+# Test stage
+# ----------------------------
 test_job:
   stage: test
+  <<: *default_settings
   script:
-    - echo "[${LOG_TIMESTAMP}] === TEST STARTED ===" >> ${LOG_DIR}/test.log
-    - make test 2>&1 | tee -a ${LOG_DIR}/test.log
-    - echo "[${LOG_TIMESTAMP}] === TEST FINISHED ===" >> ${LOG_DIR}/test.log
-  artifacts:
-    paths:
-      - ${LOG_DIR}/test.log
-    expire_in: 1 week
+    - make test 2>&1 | tee -a ${LOG_DIR}/${CI_JOB_NAME}.log
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
     - if: $CI_COMMIT_BRANCH == "main"
 
+# ----------------------------
+# Deploy stage
+# ----------------------------
 deploy_job:
   stage: deploy
+  <<: *default_settings
   needs: [build_job, test_job]
   script:
-    - echo "[${LOG_TIMESTAMP}] === DEPLOY STARTED ===" >> ${LOG_DIR}/deploy.log
-    - make run-server & 2>&1 | tee -a ${LOG_DIR}/deploy.log
+    - make run-server & 2>&1 | tee -a ${LOG_DIR}/${CI_JOB_NAME}.log
     - SERVER_PID=$!
-    - echo "Server PID saved" >> ${LOG_DIR}/deploy.log
-    - sleep 5
-    - curl -v --fail http://localhost:8080 2>&1 | tee -a ${LOG_DIR}/deploy.log
-    - kill ${SERVER_PID} 2>&1 | tee -a ${LOG_DIR}/deploy.log | true
-    - echo "[${LOG_TIMESTAMP}] === DEPLOY FINISHED ===" >> ${LOG_DIR}/deploy.log
-  artifacts:
-    paths:
-      - ${LOG_DIR}/deploy.log
-    expire_in: 1 week
+    - echo "Server PID saved" >> ${LOG_DIR}/${CI_JOB_NAME}.log
+    - sleep 5 | tee -a ${LOG_DIR}/${CI_JOB_NAME}.log
+    - curl -v --fail http://localhost:8080 2>&1 | tee -a ${LOG_DIR}/${CI_JOB_NAME}.log
+    - kill ${SERVER_PID} 2>&1 | tee -a ${LOG_DIR}/${CI_JOB_NAME}.log | true
   rules:
     - if: $CI_COMMIT_BRANCH == "main"
   when: manual
