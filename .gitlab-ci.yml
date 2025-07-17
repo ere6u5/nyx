@@ -23,6 +23,7 @@ build_job:
       - ${BIN_DIR}
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH == "main" 
 
 test_job:
   stage: test
@@ -30,6 +31,7 @@ test_job:
     - make test
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH == "main"
 
 deploy_job:
   stage: deploy
@@ -42,4 +44,5 @@ deploy_job:
     - sleep 5
     - curl --fail http://localhost:8080
   rules:
-    - if: $CI_COMMIT_BRANCH == "main" && $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH == "main"
+  when: manual
