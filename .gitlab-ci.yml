@@ -120,6 +120,8 @@ build_job:
   rules:
     - if: $CI_COMMIT_BRANCH == "report/demo-my-work"
       when: on_success
+    - if: $CI_COMMIT_BRANCH == "report/test"
+      when: on_success
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
     - if: $CI_COMMIT_BRANCH == "main" 
 
