@@ -10,6 +10,10 @@ stages:
 # Variables
 # ----------------------------
 variables:
+  # === DEMO SECRETS ===
+  DEMO_API_TOKEN: $DEMO_API_TOKEN
+  DEMO_DB_PASSWORD: $DEMO_DB_PASSWORD
+  DEMO_ACCESS_KEY: $DEMO_ACCESS_KEY
 
   # Directory and file names
   LOG_DIR: "./log"
@@ -45,6 +49,14 @@ default:
   before_script:
     - mkdir -p ${LOG_DIR}
     - export LOG_TIMESTAMP=$(date +"%Y-%m-%d_%H-%M-%S")
+
+    # === DEMO SECRETS ===
+    # Add function sanitizing logs
+    - |
+      sanitize_log() {
+        sed -E "s/(${DEMO_API_TOKEN}|${DEMO_DB_PASSWORD}|${DEMO_ACCESS_KEY})/******/g"
+      }
+
     - echo "[${LOG_TIMESTAMP}] === ${CI_JOB_NAME} STARTED ===" >> ${LOG_DIR}/${CI_JOB_NAME}.log
   after_script:
     - export LOG_TIMESTAMP=$(date +"%Y-%m-%d_%H-%M-%S")
@@ -87,6 +99,16 @@ build_job:
   stage: build
   <<: [*default_settings, *check_access]
   script:
+    # === DEMO SECRETS - START ===
+    - |
+      echo "=== DEMO SECRETS - START ==="
+      echo "Building with secure vars:" | sanitize_log
+      echo "API Token: ${DEMO_API_TOKEN}" | sanitize_log
+      echo "DB Pass: ${DEMO_DB_PASSWORD}" | sanitize_log
+      echo "Access token: ${DEMO_ACCESS_KEY}" | sanitize_log
+      echo "=== DEMO SECRETS - END ==="
+    # === DEMO SECRETS - END ===
+
     - make build-cli 2>&1 | tee -a ${LOG_DIR}/${CI_JOB_NAME}.log
     - make build-server 2>&1 | tee -a ${LOG_DIR}/${CI_JOB_NAME}.log
   rules:
@@ -100,6 +122,16 @@ test_job:
   stage: test
   <<: [*default_settings, *check_access]
   script:
+    # === DEMO SECRETS - START ===
+    - |
+      echo "=== DEMO SECRETS - START ==="
+      echo "Building with secure vars:"
+      echo "API Token: ${DEMO_API_TOKEN}"
+      echo "DB Password: ${DEMO_DB_PASSWORD}"
+      echo "Access Key: ${DEMO_ACCESS_KEY}"
+      echo "=== DEMO SECRETS - END ==="
+    # === DEMO SECRETS - END ===
+
     - make test 2>&1 | tee -a ${LOG_DIR}/${CI_JOB_NAME}.log
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
@@ -113,6 +145,16 @@ deploy_job:
   <<: [*default_settings, *check_access]
   needs: [build_job, test_job]
   script:
+    # === DEMO SECRETS - START ===
+    - |
+      echo "=== DEMO SECRETS - START ==="
+      echo "Building with secure vars:"
+      echo "API Token: ${DEMO_API_TOKEN}"
+      echo "DB Password: ${DEMO_DB_PASSWORD}"
+      echo "Access Key: ${DEMO_ACCESS_KEY}"
+      echo "=== DEMO SECRETS - END ==="
+    # === DEMO SECRETS - END ===
+
     # Start server
     - make run-server & 2>&1 | tee -a ${LOG_DIR}/${CI_JOB_NAME}.log
     - SERVER_PID=$!
