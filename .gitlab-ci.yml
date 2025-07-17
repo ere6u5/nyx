@@ -54,7 +54,7 @@ default:
     # Add function sanitizing logs
     - |
       sanitize_log() {
-        sed -E "s/(${DEMO_API_TOKEN}|${DEMO_DB_PASSWORD}|${DEMO_ACCESS_KEY})/******/g"
+        sed -E "s/(${DEMO_API_TOKEN}|${DEMO_DB_PASSWORD}|${DOCKER_IMAGE}|${DEMO_ACCESS_KEY})/******/g"
       }
 
     - echo "[${LOG_TIMESTAMP}] === ${CI_JOB_NAME} STARTED ===" >> ${LOG_DIR}/${CI_JOB_NAME}.log
@@ -102,10 +102,13 @@ build_job:
     # === DEMO SECRETS - START ===
     - |
       echo "=== DEMO SECRETS - START ===" >> ${LOG_DIR}/${CI_JOB_NAME}.log
+      
       echo "Building with secure vars:" | sanitize_log >> ${LOG_DIR}/${CI_JOB_NAME}.log
+      echo "DOCKER_IMAGE: ${DOCKER_IMAGE}" | sanitize_log >> ${LOG_DIR}/${CI_JOB_NAME}.log
       echo "API Token: ${DEMO_API_TOKEN}" | sanitize_log >> ${LOG_DIR}/${CI_JOB_NAME}.log
       echo "DB Pass: ${DEMO_DB_PASSWORD}" | sanitize_log >> ${LOG_DIR}/${CI_JOB_NAME}.log
       echo "Access token: ${DEMO_ACCESS_KEY}" | sanitize_log >> ${LOG_DIR}/${CI_JOB_NAME}.log
+      echo "DOCKER_IMAGE: ${DOCKER_IMAGE}" >> ${LOG_DIR}/${CI_JOB_NAME}.log
       echo "API Token: ${DEMO_API_TOKEN}" >> ${LOG_DIR}/${CI_JOB_NAME}.log
       echo "DB Pass: ${DEMO_DB_PASSWORD}" >> ${LOG_DIR}/${CI_JOB_NAME}.log
       echo "Access token: ${DEMO_ACCESS_KEY}" >> ${LOG_DIR}/${CI_JOB_NAME}.log
