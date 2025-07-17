@@ -94,7 +94,7 @@ default:
 
 # ----------------------------
 # Build stage
-# ----------------------------
+# -----------------------------
 build_job:
   stage: build
   <<: [*default_settings, *check_access]
