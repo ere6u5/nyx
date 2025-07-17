@@ -4,23 +4,29 @@ stages:
   - deploy
 
 variables:
+  LOG_DIR: "./log"
+  LOG_TIMESTAMP: $(date +"%Y-%m-%d_%H-%M-%S")
   BIN_DIR: "./bin"
   CLI_EXE: "nyx-cli"
   SERVER_EXE: "nyx-server"
 
 image: golang:1.24.4-alpine3.21
 
+before_script:
+  - mkdir -p ${LOG_DIR}
+
 build_job:
   stage: build
-  before_script:
-    - echo "Start build stage..."
-    - echo ""
   script:
-    - make build-cli
-    - make build-server
+    - echo "[${LOG_TIMESTAMP}] === BUILD STARTED ===" >> ${LOG_DIR}/build.log
+    - make build-cli 2>&1 | tee -a ${LOG_DIR}/build.log
+    - make build-server 2>&1 | tee -a ${LOG_DIR}/build.log
+    - echo "[${LOG_TIMESTAMP}] === BUILD FINISHED ===" >> ${LOG_DIR}/build.log
   artifacts:
     paths:
       - ${BIN_DIR}
+      - ${LOG_DIR}/build.log
+    expire_in: 1 week
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
     - if: $CI_COMMIT_BRANCH == "main" 
@@ -28,7 +34,13 @@ build_job:
 test_job:
   stage: test
   script:
-    - make test
+    - echo "[${LOG_TIMESTAMP}] === TEST STARTED ===" >> ${LOG_DIR}/test.log
+    - make test 2>&1 | tee -a ${LOG_DIR}/test.log
+    - echo "[${LOG_TIMESTAMP}] === TEST FINISHED ===" >> ${LOG_DIR}/test.log
+  artifacts:
+    paths:
+      - ${LOG_DIR}/test.log
+    expire_in: 1 week
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
     - if: $CI_COMMIT_BRANCH == "main"
@@ -36,16 +48,19 @@ test_job:
 deploy_job:
   stage: deploy
   needs: [build_job, test_job]
-  before_script:
-    - echo "Server deploy..."
   script:
-    - make run-server &
+    - echo "[${LOG_TIMESTAMP}] === DEPLOY STARTED ===" >> ${LOG_DIR}/deploy.log
+    - make run-server & 2>&1 | tee -a ${LOG_DIR}/deploy.log
     - SERVER_PID=$!
-    - echo "Server started with PID"
+    - echo "Server PID saved" >> ${LOG_DIR}/deploy.log
     - sleep 5
-    - curl -v --fail http://localhost:8080
-    - kill $SERVER_PID || true
-    - echo "Server stopped"
+    - curl -v --fail http://localhost:8080 2>&1 | tee -a ${LOG_DIR}/deploy.log
+    - kill ${SERVER_PID} 2>&1 | tee -a ${LOG_DIR}/deploy.log
+    - echo "[${LOG_TIMESTAMP}] === DEPLOY FINISHED ===" >> ${LOG_DIR}/deploy.log
+  artifacts:
+    paths:
+      - ${LOG_DIR}/deploy.log
+    expire_in: 1 week
   rules:
     - if: $CI_COMMIT_BRANCH == "main"
   when: manual
