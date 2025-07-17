@@ -10,7 +10,7 @@ stages:
 # Variables
 # ----------------------------
 variables:
-  # === DEMO SECRETS ===
+  # === DEMO SECRETS ====
   DEMO_API_TOKEN: $DEMO_API_TOKEN
   DEMO_DB_PASSWORD: $DEMO_DB_PASSWORD
   DEMO_ACCESS_KEY: $DEMO_ACCESS_KEY
