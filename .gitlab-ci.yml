@@ -4,15 +4,31 @@ stages:
   - deploy
 
 variables:
+
+  # Directory and file names
   LOG_DIR: "./log"
   BIN_DIR: "./bin"
   CLI_EXE: "nyx-cli"
-  SERVER_EXE: "nyx-server"
 
-image: golang:1.24.4-alpine3.21
+  # Docker configuration
+  DOCKER_IMAGE: $DOCKER_IMAGE
+
+  # Build server settings
+  SERVER_EXE: "nyx-server"
+  SERVER_PROTO: "http"
+  SERVER_URL: "localhost"
+  SERVER_PORT: "8080"
+  SERVER_START_TIMEOUT: "5"
+  SERVER_KILL_TIMEOUT: "2"
 
 # ----------------------------
-# Setting's for all jobs
+# Global settings
+# ----------------------------
+default:
+  image: ${DOCKER_IMAGE}
+
+# ----------------------------
+# Basic anchors
 # ----------------------------
 .default_settings: &default_settings
   before_script:
@@ -20,6 +36,7 @@ image: golang:1.24.4-alpine3.21
     - export LOG_TIMESTAMP=$(date +"%Y-%m-%d_%H-%M-%S")
     - echo "[${LOG_TIMESTAMP}] === ${CI_JOB_NAME} STARTED ===" >> ${LOG_DIR}/${CI_JOB_NAME}.log
   after_script:
+    - export LOG_TIMESTAMP=$(date +"%Y-%m-%d_%H-%M-%S")
     - echo "[${LOG_TIMESTAMP}] === ${CI_JOB_NAME} FINISHED ===" >> ${LOG_DIR}/${CI_JOB_NAME}.log
   artifacts:
     paths:
@@ -60,12 +77,20 @@ deploy_job:
   <<: *default_settings
   needs: [build_job, test_job]
   script:
+    # Start server
     - make run-server & 2>&1 | tee -a ${LOG_DIR}/${CI_JOB_NAME}.log
     - SERVER_PID=$!
     - echo "Server PID saved" >> ${LOG_DIR}/${CI_JOB_NAME}.log
-    - sleep 5 | tee -a ${LOG_DIR}/${CI_JOB_NAME}.log
-    - curl -v --fail http://localhost:8080 2>&1 | tee -a ${LOG_DIR}/${CI_JOB_NAME}.log
+    - sleep ${SERVER_START_TIMEOUT} | tee -a ${LOG_DIR}/${CI_JOB_NAME}.log
+
+    # Check server
+    - curl -v --fail ${SERVER_PROTO}://${SERVER_URL}:${SERVER_PORT} 2>&1 | tee -a ${LOG_DIR}/${CI_JOB_NAME}.log
+
+    # Shutdown server
     - kill ${SERVER_PID} 2>&1 | tee -a ${LOG_DIR}/${CI_JOB_NAME}.log | true
+    - sleep ${SERVER_KILL_TIMEOUT}
+    - wait ${SERVER_PID} 2>/dev/null || true
+
   rules:
     - if: $CI_COMMIT_BRANCH == "main"
   when: manual
