@@ -1,8 +1,14 @@
+# ----------------------------
+# Stages
+# ----------------------------
 stages:
   - build
   - test
   - deploy
 
+# ----------------------------
+# Variables
+# ----------------------------
 variables:
 
   # Directory and file names
@@ -27,9 +33,14 @@ variables:
 default:
   image: ${DOCKER_IMAGE}
 
+  interruptible: true
+  timeout: 10m
+
 # ----------------------------
-# Basic anchors
+# Basic templastes
 # ----------------------------
+
+# Logs
 .default_settings: &default_settings
   before_script:
     - mkdir -p ${LOG_DIR}
@@ -44,12 +55,37 @@ default:
     expire_in: 1 week
     when: always
 
+# Check role
+.check_access: &check_access
+  before_script:
+    - |
+      case $CI_JOB_STAGE in
+        deploy)
+          if [ "$CI_DEPLOY_ACCESS_LEVEL" -lt 40 ]; then
+            echo "Only maintainer can do it this"
+            exit 1
+          fi
+          ;;
+        test)
+          if [ "$CI_DEPLOY_ACCESS_LEVEL" -lt 30 ]; then
+            echo "Only developer can do it this"
+            exit 1
+          fi
+          ;;
+        build)
+          if [ "$CI_DEPLOY_ACCESS_LEVEL" -lt 20 ]; then
+            echo "Only reporter can do it this"
+            exit 1
+          fi
+          ;;
+      esac
+
 # ----------------------------
 # Build stage
 # ----------------------------
 build_job:
   stage: build
-  <<: *default_settings
+  <<: [*default_settings, *check_access]
   script:
     - make build-cli 2>&1 | tee -a ${LOG_DIR}/${CI_JOB_NAME}.log
     - make build-server 2>&1 | tee -a ${LOG_DIR}/${CI_JOB_NAME}.log
@@ -62,7 +98,7 @@ build_job:
 # ----------------------------
 test_job:
   stage: test
-  <<: *default_settings
+  <<: [*default_settings, *check_access]
   script:
     - make test 2>&1 | tee -a ${LOG_DIR}/${CI_JOB_NAME}.log
   rules:
@@ -74,7 +110,7 @@ test_job:
 # ----------------------------
 deploy_job:
   stage: deploy
-  <<: *default_settings
+  <<: [*default_settings, *check_access]
   needs: [build_job, test_job]
   script:
     # Start server
@@ -93,4 +129,4 @@ deploy_job:
 
   rules:
     - if: $CI_COMMIT_BRANCH == "main"
-  when: manual
+      when: manual
