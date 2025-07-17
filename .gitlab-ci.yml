@@ -50,7 +50,7 @@ default:
     - mkdir -p ${LOG_DIR}
     - export LOG_TIMESTAMP=$(date +"%Y-%m-%d_%H-%M-%S")
 
-    # === DEMO SECRETS ====
+    # === DEMO SECRETS ===
     # Add function sanitizing logs
     - |
       sanitize_log() {
