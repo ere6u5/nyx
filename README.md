@@ -90,7 +90,7 @@ default:
 | **Ролевой доступ** | Доступ к переменным окружения есть только у `maintainer` |
 | **Контроль доступа** | Проверка ролей в исполняемой единице `.check_access` |
 | **Контроль деплоя** | В `stage: deploy` использовался `when: manual`. Также перед выгрузкой коммита он должен сначала пройти `pipeline`'ы |
-| **Маскировка логов** | Функция `sanitize_log` + GitLab Masked Variables |
+| **Маскировка логов** | Функция `sanitize_log` + *GitLab* Masked Variables |
 | **Очистка артефактов** | Автоудаление логов через `expire_in: 1 week` |
 ---
 
@@ -98,7 +98,7 @@ default:
 
 #### Защита веток
 
-Для тестирования функций GitLab была создана `Protected` ветка:
+Для тестирования функций *GitLab* была создана `Protected` ветка:
 
 ![Nyx Web Interface](screenshots/pipeline/protected-branch.png)
 
@@ -288,7 +288,7 @@ gitlab-runner run --config "$PWD/gitlab-runner-config.toml" --working-directory 
 - Ручное подтверждение деплоя (`when: manual`).
 
 Инфраструктура
-- Развёрнут защищённый Runner (Protected + shell-исполнитель).
+- Развёрнут защищённый `Runner` (`Protected` + `shell`-исполнитель).
 - Логирование с метками времени для аудита.
 
 # Nyx - Simple Port Scanner in Go
